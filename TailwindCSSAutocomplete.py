@@ -87,7 +87,7 @@ class TailwindCSSAutocomplete(sublime_plugin.EventListener):
     # we override this if we are inside an @apply
     def on_text_command(self, view, command_name, args):
         cursor = view.sel()[0].begin()
-        isCss = view.match_selector(cursor, 'source.css meta.property-list.css')
+        isCss = self.check_css_scope(view, cursor)
 
         if isCss == False:
             return None
@@ -138,7 +138,7 @@ class TailwindCSSAutocomplete(sublime_plugin.EventListener):
         if items is None:
             return []
 
-        isCss = view.match_selector(locations[0], 'source.css meta.property-list.css')
+        isCss = self.check_css_scope(view, locations[0])
         isHtml = view.match_selector(locations[0], 'text.html string.quoted') or view.match_selector(locations[0], 'string.quoted.jsx')
 
         if isCss == False and isHtml == False:
@@ -216,3 +216,6 @@ class TailwindCSSAutocomplete(sublime_plugin.EventListener):
             if module is not None:
                 break
         return module
+
+    def check_css_scope(self, view, matcher):
+        return view.match_selector(matcher, 'source.css meta.property-list.css') or view.match_selector(matcher, 'source.postcss') or view.match_selector(matcher, 'source.scss')
